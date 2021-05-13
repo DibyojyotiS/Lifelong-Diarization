@@ -72,6 +72,7 @@ def vge2e(x, labels, centroids, w: tf.Variable, b: tf.Variable, eps=0.01):
                 corresponding centroid is assumed to move it by 
                 eps * v, giving: ckv = (1+eps)*ck - eps*v; eps<<1
         note 3: centroids should be ordered by label
+        note 4: there is no class weighting of the loss
     """
 
     x = tf.cast(x, tf.float32)

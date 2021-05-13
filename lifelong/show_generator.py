@@ -66,6 +66,7 @@ def majority_label(cur_segments, start, end):
 
 
 def assign_label(interval, small_transcript):
+    """ assignes the label that occurs for the majority in the given interval """
     start, end = interval
     s = bin_search(0, len(small_transcript)-1, start, small_transcript)
     t = bin_search(0, len(small_transcript)-1, end, small_transcript)
@@ -127,10 +128,13 @@ def interval_loader(intervals, fname, audio_dir, featextr_fn, cache_dir=None, sr
 class show_generator(threading.Thread):
 
     def __init__(self, small_transcripts, featextr_fn, audio_dir, cache_dir=None, sr=22050, prefetch_buffer_size=3, max_threads=10):
-        """ featextr_fn : function to extract features takes in audio data and sample rate 
-            show_len: length of the audio in minutes
-            batch_size: number of such audio segments in one batch, 
-            small_transcripts: a dict like object with <fname>.<split_num>.<show_len(in sec)> as keys"""
+        """ small_transcripts: a dict like object with <fname>.<split_num>.<show_len(in sec)> as keys
+            featextr_fn : function to extract features takes in an array audio data and sample rate 
+            audio_dir : directory where the audio files are stored
+                        the directory structure is <audio_dir>/<fname>/<fname>.interaction.wav
+            sr : sampling rate for loading audio
+            prefetch_buffer_size : maximum number of prefetched batches available at any time instant.
+            max_threads : ignored. runs only a single thread """
 
         threading.Thread.__init__(self)
 
@@ -179,6 +183,7 @@ class show_generator(threading.Thread):
         return batch
 
     def _prefetch_worker(self):
+        """ multithreading worker to prefetch batch """
         self.active_threads += 1
         try:
             batch = self._sequencial_make_batch()
