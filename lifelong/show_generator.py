@@ -96,12 +96,20 @@ def interval_loader(intervals, fname, audio_dir, featextr_fn, cache_dir=None, sr
     # global data_cache
 
     if cache_dir is not None:
+
         if data_cache.get(fname, False):
             x = np.load(f"{cache_dir}/{fname}.npy", allow_pickle=True)
         else:
             x, _ = librosa.load(f"{audio_dir}/{fname}/{fname}.interaction.wav", sr)
             data_cache[fname] = True
             np.save(f"{cache_dir}/{fname}.npy", x)
+
+        # delete old cached files
+        if len(data_cache.keys()) > 4:
+            fname = [*data_cache.keys()][0]
+            path = f"{cache_dir}/{fname}.npy"
+            if os.path.exists(path): os.remove(path)
+            data_cache.pop(fname)
     else:
         x, _ = librosa.load(f"{audio_dir}/{fname}/{fname}.interaction.wav", sr)
     
@@ -184,8 +192,7 @@ class show_generator(threading.Thread):
         while len(self.small_transcripts) > 0:
             # while self.active_threads < self.max_threads:
             #     threading.Thread(target=self._prefetch_worker, daemon=True).start()
-            batch = self._sequencial_make_batch()
-            self.queue.put(batch)  
+            self._prefetch_worker()
         self.queue.put(None)
 
     def dict_generator(self):
