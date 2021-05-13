@@ -38,6 +38,9 @@ def add_clicks(data, num_shots=10, sr=16000):
     return aug_data
 
 def augment_audio(data, sr=16000):
+    """ augments the given array of audio data by randomly
+        adding one or more of white noise, tones, clicks, 
+        and time shift """
     if np.random.randn() > 0.5:
         data = add_white_noise(data, sr=sr)
     if np.random.randn() > 0.5:
